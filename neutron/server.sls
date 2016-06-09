@@ -5,14 +5,14 @@ neutron_server_packages:
   pkg.installed:
   - names: {{ server.pkgs }}
 
-{% if server.plugin == "contrail" %}
-
 /etc/neutron/neutron.conf:
   file.managed:
-  - source: salt://neutron/files/{{ server.version }}/neutron-server.conf.contrail.{{ grains.os_family }}
+  - source: salt://neutron/files/{{ server.version }}/neutron-server.conf.{{ server.plugin }}.{{ grains.os_family }}
   - template: jinja
   - require:
     - pkg: neutron_server_packages
+
+{% if server.plugin == "contrail" %}
 
 /etc/neutron/plugins/opencontrail/ContrailPlugin.ini:
   file.managed:
@@ -34,6 +34,30 @@ neutron_contrail_package:
   pkg.installed:
   - name: neutron-plugin-contrail
 
+{%- elif server.plugin == "ml2"  %}
+
+/etc/neutron/plugins/ml2/ml2_conf.ini:
+  file.managed:
+  - source: salt://neutron/files/{{ server.version }}/ml2_conf.ini
+  - template: jinja
+  - require:
+    - pkg: neutron_server_packages
+    - pkg: neutron_ml2_package
+
+ml2_plugin_link:
+  cmd.run:
+  - names:
+    - ln -s /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugin.ini
+  - unless: test -e /etc/neutron/plugin.ini
+  - require:
+    - file: /etc/neutron/plugins/ml2/ml2_conf.ini
+
+neutron_ml2_package:
+  pkg.installed:
+  - names: {{ server.pkgs_ml2 }}
+
+{%- endif %}
+
 neutron_server_service:
   service.running:
   - name: neutron-server
@@ -51,8 +75,6 @@ neutron_server_service:
     - pkg: neutron_server_packages
   - watch_in:
     - service: neutron_server_services
-
-{%- endif %}
 
 {%- endif %}
 
