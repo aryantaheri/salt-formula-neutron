@@ -4,26 +4,62 @@ parameters:
   neutron:
     bridge:
       enabled: true
-      version: icehouse
+      version: liberty
+      verbose: True
+      plugin: ml2
+      ml2:
+        ovs:
+          tunnel_interface: eth0
+          bridge_mappings: 
+            - physical_network: vlan
+              bridge: br-vlan
+              physical_interface: eth0
+            - physical_network: external
+              bridge: br-ex
+              physical_interface: eth0
+        agent:
+          tunnel_types:
+            - gre
+            - vxlan
+          l2_population: True
+          prevent_arp_spoofing: True
+        securitygroup:
+          enabled: True
+      l3_agent:
+        verbose: True
+        interface_driver: neutron.agent.linux.interface.OVSInterfaceDriver
+        use_namespaces: True
+        external_network_bridge: null
+      dhcp_agent:
+        verbose: True
+        interface_driver: neutron.agent.linux.interface.OVSInterfaceDriver
+        dhcp_driver: neutron.agent.linux.dhcp.Dnsmasq
+        enable_isolated_metadata: True
+        dnsmasq_config_file:
+          path: '/etc/neutron/dnsmasq-neutron.conf'
+          options: 
+            - 'dhcp-option-force = 26,1450'
+            - 'log-facility = /var/log/neutron/dnsmasq.log'
       migration: true
       mtu: 1500
       bind:
-        address: ${linux:network:host:local:address}
+        address: ${_param:single_address}
       metadata:
-        host: ${linux:network:host:vip:address}
+        verbose: True
+        host: ${_param:cluster_vip_address}
         port: 8775
         password: metadataPass
       identity:
         engine: keystone
-        host: ${linux:network:host:vip:address}
+        host: ${_param:keystone_service_host}
         port: 35357
         user: neutron
-        password: ${_secret:keystone_neutron_password}
+        password: ${_param:keystone_neutron_password}
         tenant: service
       message_queue:
         engine: rabbitmq
-        host: ${linux:network:host:vip:address}
+        host: ${_param:cluster_vip_address}
         port: 5672
         user: openstack
-        password: ${_secret:rabbitmq_openstack_password}
+        password: ${_param:rabbitmq_openstack_password}
         virtual_host: '/openstack'
