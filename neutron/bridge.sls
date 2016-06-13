@@ -36,7 +36,6 @@ neutron_network_ml2_packages:
   - names: {{ bridge.pkgs_ml2 }}
 
 {% if bridge.ml2.ovs.bridge_mappings is defined %}
-
 {% for bridge_mapping in bridge.ml2.ovs.bridge_mappings -%}
 
 create_ovs_bridge_{{ bridge_mapping.bridge }}:
@@ -53,10 +52,7 @@ add_physical_interface_{{ bridge_mapping.physical_interface }}_to_{{ bridge_mapp
       - cmd: create_ovs_bridge_{{ bridge_mapping.bridge }}
 
 {% endfor %}
-
 {% endif %}
-
-{%- endif %}
 
 /etc/neutron/plugins/ml2/openvswitch_agent.ini:
   file.managed:
@@ -110,5 +106,8 @@ neutron_network_services:
 
 # Create neutron networks, based on the bridge_mappings configuration.
 
+# End of plugin ml2
 {%- endif %}
+
 # bridge.enabled 
+{%- endif %}
