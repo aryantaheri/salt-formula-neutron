@@ -360,7 +360,7 @@ notify_nova_on_port_status_changes = True
 # so nova can update it's cache.
 # notify_nova_on_port_data_changes = True
 # TEMPORARY BUG - cannot associate floating ips with notification port True. OpenStack Bug 
-notify_nova_on_port_data_changes = False
+notify_nova_on_port_data_changes = True
 
 # URL for connection to nova (Only supports one nova region currently).
 # nova_url = http://127.0.0.1:8774/v2
@@ -795,7 +795,6 @@ connection = {{ server.database.engine }}://{{ server.database.user }}:{{ server
 [nova]
 # Name of the plugin to load
 # auth_plugin =
-auth_plugin = password
 
 # Config Section from which to load plugin specific options
 # auth_section =
@@ -817,6 +816,17 @@ auth_plugin = password
 
 # Timeout value for http requests
 # timeout =
+
+auth_url = http://{{ neutron.identity.host }}:{{ neutron.identity.port }}/v2.0
+auth_plugin = password
+#project_domain_id = default
+#user_domain_id = default
+region_name = {{ neutron.compute.region }}
+project_name = {{ neutron.compute.tenant }}
+username = {{ neutron.compute.user }}
+password = {{ neutron.compute.password }}
+
+#vif_types = vrouter
 
 [oslo_concurrency]
 
@@ -1040,8 +1050,7 @@ quota_network = -1
 quota_subnet = -1
 quota_port = -1
 
-[NOVA]
-vif_types = vrouter
+
 
 
 {%- if server.plugin == 'contrail' %}
