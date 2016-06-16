@@ -77,7 +77,7 @@ use_namespaces = {{ bridge.l3_agent.use_namespaces }}
 # This option is deprecated and will be removed in the M release.
 # external_network_bridge = br-ex
 
-external_network_bridge = {{ bridge.l3_agent.external_network_bridge }}
+external_network_bridge =
 
 # TCP Port used by Neutron metadata server
 # metadata_port = 9697

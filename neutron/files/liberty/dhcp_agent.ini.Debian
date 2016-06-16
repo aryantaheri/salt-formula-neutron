@@ -86,9 +86,9 @@ enable_isolated_metadata = {{ bridge.dhcp_agent.enable_isolated_metadata }}
 # Override the default dnsmasq settings with this file
 # dnsmasq_config_file =
 
-{%- if bridge.dhcp_agent.dnsmasq_config_file is defined -%}
+{%- if bridge.dhcp_agent.dnsmasq_config_file is defined %}
 dnsmasq_config_file = {{ bridge.dhcp_agent.dnsmasq_config_file.path }}
-{%- endif -%}
+{%- endif %}
 
 # Comma-separated list of DNS servers which will be used by dnsmasq
 # as forwarders.

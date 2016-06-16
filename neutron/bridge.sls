@@ -43,6 +43,7 @@ create_ovs_bridge_{{ bridge_mapping.bridge }}:
     - name: "ovs-vsctl add-br {{ bridge_mapping.bridge }}"
     - unless: "ovs-vsctl br-exists {{ bridge_mapping.bridge }}"
 
+{% if bridge_mapping.physical_interface is defined %}
 add_physical_interface_{{ bridge_mapping.physical_interface }}_to_{{ bridge_mapping.bridge }}:
     cmd.run:
     - name: "ovs-vsctl add-port {{ bridge_mapping.bridge }} {{ bridge_mapping.physical_interface }}"
@@ -50,6 +51,7 @@ add_physical_interface_{{ bridge_mapping.physical_interface }}_to_{{ bridge_mapp
     - onlyif: "ip link list | egrep {{ bridge_mapping.physical_interface }}" 
     - require:
       - cmd: create_ovs_bridge_{{ bridge_mapping.bridge }}
+{% endif %}
 
 {% endfor %}
 {% endif %}

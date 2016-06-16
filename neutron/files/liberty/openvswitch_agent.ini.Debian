@@ -1,4 +1,11 @@
+{%- if pillar.neutron.bridge is defined -%}
 {%- from "neutron/map.jinja" import bridge with context %}
+{% set neutron_settings = bridge %}
+{%- elif pillar.neutron.compute is defined -%}
+{%- from "neutron/map.jinja" import compute with context %}
+{% set neutron_settings = compute %}
+{%- endif -%}
+
 [ovs]
 # Do not change this parameter unless you have a good reason to.
 # This is the name of the OVS integration bridge. There is one per hypervisor.
@@ -25,7 +32,7 @@
 #
 # local_ip =
 # TODO: make sure this works
-{% set tunnel_interface_ip = salt.network.ip_addrs(interface=bridge.ml2.ovs.tunnel_interface)[0] %}
+{% set tunnel_interface_ip = salt.network.ip_addrs(interface=neutron_settings.ml2.ovs.tunnel_interface)[0] %}
 local_ip = {{ tunnel_interface_ip }}
 
 # (ListOpt) Comma-separated list of <physical_network>:<bridge> tuples
@@ -42,8 +49,8 @@ local_ip = {{ tunnel_interface_ip }}
 # bridge_mappings =
 # Example: bridge_mappings = physnet1:br-eth1
 
-{% if bridge.ml2.ovs.bridge_mappings is defined %}
-bridge_mappings = {% for bridge_mapping in bridge.ml2.ovs.bridge_mappings -%}
+{% if neutron_settings.ml2.ovs.bridge_mappings is defined %}
+bridge_mappings = {% for bridge_mapping in neutron_settings.ml2.ovs.bridge_mappings -%}
 	             {{ bridge_mapping.physical_network }}:{{ bridge_mapping.bridge }}
 		     {%- if not loop.last -%},{%- endif -%}
 		  {%- endfor -%}
@@ -118,8 +125,8 @@ bridge_mappings = {% for bridge_mapping in bridge.ml2.ovs.bridge_mappings -%}
 # Example: tunnel_types = vxlan
 # Example: tunnel_types = vxlan, gre
 
-{% if bridge.ml2.agent.tunnel_types is defined %}
-tunnel_types = {% for tunnel_type in bridge.ml2.agent.tunnel_types -%}
+{% if neutron_settings.ml2.agent.tunnel_types is defined %}
+tunnel_types = {% for tunnel_type in neutron_settings.ml2.agent.tunnel_types -%}
 	          {{ tunnel_type }}
 		  {%- if not loop.last -%},{%- endif -%}
 	       {%- endfor -%}
@@ -148,7 +155,7 @@ tunnel_types = {% for tunnel_type in bridge.ml2.agent.tunnel_types -%}
 #
 # l2_population = False
 
-l2_population = {{ bridge.ml2.agent.l2_population }}
+l2_population = {{ neutron_settings.ml2.agent.l2_population }}
 
 # Enable local ARP responder. Requires OVS 2.1. This is only used by the l2
 # population ML2 MechanismDriver.
@@ -164,7 +171,7 @@ l2_population = {{ bridge.ml2.agent.l2_population }}
 #
 # prevent_arp_spoofing = True
 
-prevent_arp_spoofing = {{ bridge.ml2.agent.prevent_arp_spoofing }}
+prevent_arp_spoofing = {{ neutron_settings.ml2.agent.prevent_arp_spoofing }}
 
 # (BoolOpt) Set or un-set the don't fragment (DF) bit on outgoing IP packet
 # carrying GRE/VXLAN tunnel. The default value is True.
@@ -210,7 +217,7 @@ firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewal
 # It should be false when you use nova security group.
 # enable_security_group = True
 
-enable_security_group = {{ bridge.ml2.securitygroup.enabled }}
+enable_security_group = {{ neutron_settings.ml2.securitygroup.enabled }}
 
 #-----------------------------------------------------------------------------
 # Sample Configurations.
