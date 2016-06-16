@@ -8,6 +8,18 @@ parameters:
       enabled: true
       fwaas: false
       dns_domain: novalocal
+      ml2:
+        # type_drivers: e.g. flat,vlan,gre,vxlan,geneve
+        type_drivers:
+          - vxlan
+        # tenant_network_types: e.g. vlan,gre,vxlan,geneve
+        tenant_network_types:
+          - vxlan
+        mechanism_drivers:
+          - openvswitch
+          - logger
+        extension_drivers:
+          - port_security
       tunnel_type: vxlan
       version: ${_param:neutron_version}
       bind:

@@ -102,4 +102,6 @@ neutron_entrypoint:
 
 {%- endif %}
 
+# Create external and other pre-defined networks.
+
 {%- endif %}
