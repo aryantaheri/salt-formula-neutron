@@ -1,6 +1,77 @@
 {% from "neutron/map.jinja" import compute with context %}
 {%- if compute.enabled %}
 
-{#TBD: prepared role for OpenVSwitch implementation on Compute node side#}
+net.ipv4.ip_forward:
+  sysctl.present:
+    - value: 1
+
+neutron_compute_packages:
+  pkg.installed:
+  - names: {{ compute.pkgs }}
+
+{%- if compute.dvr.enabled %}
+
+neutron_compute_packages_dvr:
+  pkg.installed:
+  - names: {{ compute.pkgs_dvr }}
+
+{%- endif %}
+
+{%- if compute.plugin == 'ml2' %}
+
+neutron_compute_packages_ml2:
+  pkg.installed:
+  - names: {{ compute.pkgs_ml2 }}
+
+/etc/neutron/neutron.conf:
+  file.managed:
+  - source: salt://neutron/files/{{ compute.version }}/neutron-compute.conf.{{ compute.plugin }}.{{ grains.os_family }}
+  - template: jinja
+  - require:
+    - pkg: neutron_compute_packages
+
+/etc/neutron/plugins/ml2/openvswitch_agent.ini:
+  file.managed:
+  - source: salt://neutron/files/{{ compute.version }}/openvswitch_agent.ini.{{ grains.os_family }}
+  - template: jinja
+  - require:
+    - pkg: neutron_compute_packages
+    - pkg: neutron_compute_packages_ml2
+
+{% if compute.ml2.ovs.bridge_mappings is defined %}
+{% for bridge_mapping in compute.ml2.ovs.bridge_mappings -%}
+
+create_ovs_bridge_{{ bridge_mapping.bridge }}:
+  cmd.run:
+    - name: "ovs-vsctl add-br {{ bridge_mapping.bridge }}"
+    - unless: "ovs-vsctl br-exists {{ bridge_mapping.bridge }}"
+
+{% if bridge_mapping.physical_interface is defined %}
+add_physical_interface_{{ bridge_mapping.physical_interface }}_to_{{ bridge_mapping.bridge }}:
+    cmd.run:
+    - name: "ovs-vsctl add-port {{ bridge_mapping.bridge }} {{ bridge_mapping.physical_interface }}"
+    - unless: "ovs-vsctl list-ports {{ bridge_mapping.bridge }} | grep {{ bridge_mapping.physical_interface }}"
+    - onlyif: "ip link list | egrep {{ bridge_mapping.physical_interface }}"
+    - require:
+      - cmd: create_ovs_bridge_{{ bridge_mapping.bridge }}
+{% endif %}
+
+{% endfor %}
+{% endif %}
+
+
+neutron_compute_services:
+  service.running:
+  - names: {{ compute.services }}
+  - enable: true
+  - watch:
+    - file: /etc/neutron/neutron.conf
+# Will be needed for DVR
+#    - file: /etc/neutron/plugins/ml2/ml2_conf.ini
+    - file: /etc/neutron/plugins/ml2/openvswitch_agent.ini
+
+{%- endif %}
+
+
 
 {%- endif %}
