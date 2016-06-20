@@ -11,8 +11,8 @@ verbose = {{ compute.verbose }}
 # value is "False" to support legacy mode (centralized) routers.
 #
 # router_distributed = False
-{%- if compute.dvr.enabled -%}
-router_distributed = True
+{%- if compute.dvr is defined %}
+router_distributed = {{ compute.dvr.enabled }}
 {% endif %}
 #
 # ===========End Global Config Option for Distributed L3 Router===============
