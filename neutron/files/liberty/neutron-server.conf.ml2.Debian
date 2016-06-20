@@ -1,5 +1,5 @@
-{%- set neutron = pillar.neutron.server %}
 {%- from "neutron/map.jinja" import server with context %}
+{% set neutron = server %}
 [DEFAULT]
 # Print more verbose output (set logging level to INFO instead of default WARNING level).
 # verbose = False
@@ -65,10 +65,10 @@ bind_port = {{ neutron.bind.port }}
 #core_plugin = ml2
 # Example: core_plugin = ml2
 
-{%- if server.plugin == 'contrail' %}
+{%- if neutron.plugin == 'contrail' %}
 core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2
 api_extensions_path = extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions
-{%- elif server.plugin == 'ml2' %}
+{%- elif neutron.plugin == 'ml2' %}
 core_plugin = ml2
 {%- endif %}
 
@@ -81,10 +81,10 @@ core_plugin = ml2
 # service_plugins =
 # Example: service_plugins = router,firewall,lbaas,vpnaas,metering
 
-{%- if server.plugin == 'contrail' %}
+{%- if neutron.plugin == 'contrail' %}
 # JPAVLIK TEMPRORARY DISABLE LbaaS until Contrail fix it
 #service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.plugin.LoadBalancerPlugin
-{%- elif server.plugin == 'ml2' %}
+{%- elif neutron.plugin == 'ml2' %}
 service_plugins = router
 {%- endif %}
 
@@ -563,7 +563,7 @@ rpc_thread_pool_size=70
 # Driver or drivers to handle sending notifications. (multi
 # valued)
 # notification_driver=
-{%- if server.notification %}
+{%- if neutron.notification %}
 notification_driver = neutron.openstack.common.notifier.rpc_notifier
 {%- endif %}
 # AMQP topic used for OpenStack notifications. (list value)
@@ -620,7 +620,7 @@ rpc_backend=rabbit
 # Default driver to use for quota checks
 # quota_driver = neutron.db.quota_db.DbQuotaDriver
 
-{%- if server.plugin == 'contrail' %}
+{%- if neutron.plugin == 'contrail' %}
 quota_driver = neutron_plugin_contrail.plugins.opencontrail.quota.driver.QuotaDriver
 {%- else %}
 quota_driver = neutron.db.quota_db.DbQuotaDriver
@@ -746,7 +746,7 @@ auth_region={{ neutron.identity.region }}
 [database]
 # This line MUST be changed to actually run the plugin.
 # Example:
-connection = {{ server.database.engine }}://{{ server.database.user }}:{{ server.database.password }}@{{ server.database.host }}/{{ server.database.name }}
+connection = {{ neutron.database.engine }}://{{ neutron.database.user }}:{{ neutron.database.password }}@{{ neutron.database.host }}/{{ neutron.database.name }}
 
 # Replace 127.0.0.1 above with the IP address of the database used by the
 # main neutron server. (Leave it as is if the database runs on this host.)
@@ -1016,14 +1016,14 @@ rpc_conn_pool_size = 40
 # Deprecated group/name - [DEFAULT]/rabbit_host
 # rabbit_host = localhost
 
-{%- if server.message_queue.members is defined %}
-rabbit_hosts = {% for member in server.message_queue.members -%}
+{%- if neutron.message_queue.members is defined %}
+rabbit_hosts = {% for member in neutron.message_queue.members -%}
                    {{ member.host }}:{{ member.get('port', 5672) }}
                    {%- if not loop.last -%},{%- endif -%}
                {%- endfor -%}
 {%- else %}
-rabbit_host = {{ server.message_queue.host }}
-rabbit_port = {{ server.message_queue.port }}
+rabbit_host = {{ neutron.message_queue.host }}
+rabbit_port = {{ neutron.message_queue.port }}
 {%- endif %}
 
 rabbit_userid = {{ neutron.message_queue.user }}
@@ -1053,7 +1053,7 @@ quota_port = -1
 
 
 
-{%- if server.plugin == 'contrail' %}
+{%- if neutron.plugin == 'contrail' %}
 [service_providers]
 service_provider = LOADBALANCER:Opencontrail:neutron_plugin_contrail.plugins.opencontrail.loadbalancer.driver.OpencontrailLoadbalancerDriver:default
 {%- else %}
