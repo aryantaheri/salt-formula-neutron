@@ -36,6 +36,10 @@ neutron_contrail_package:
 
 {%- elif server.plugin == "ml2"  %}
 
+neutron_ml2_package:
+  pkg.installed:
+  - names: {{ server.pkgs_ml2 }}
+
 /etc/neutron/plugins/ml2/ml2_conf.ini:
   file.managed:
   - source: salt://neutron/files/{{ server.version }}/ml2_conf.ini
@@ -52,9 +56,9 @@ ml2_plugin_link:
   - require:
     - file: /etc/neutron/plugins/ml2/ml2_conf.ini
 
-neutron_ml2_package:
-  pkg.installed:
-  - names: {{ server.pkgs_ml2 }}
+neutron_db_sync:
+  cmd.run:
+    - name: "su -s /bin/sh -c 'neutron-db-manage --config-file /etc/neutron/neutron.conf  --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head' neutron"
 
 {%- endif %}
 
