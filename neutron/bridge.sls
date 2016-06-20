@@ -24,12 +24,19 @@ neutron_network_precise_packages:
 {%- endif %}
 
 
-{%- if not pillar.neutron.server is defined %}
-{%- endif %}
-
-
 {% if bridge.plugin == "contrail" %}
 {%- elif bridge.plugin == "ml2"  %}
+
+{%- if not pillar.neutron.server is defined %}
+
+/etc/neutron/neutron.conf:
+  file.managed:
+  - source: salt://neutron/files/{{ bridge.version }}/neutron-network.conf.{{ bridge.plugin }}.{{ grains.os_family }}
+  - template: jinja
+  - require:
+    - pkg: neutron_network_packages
+
+{%- endif %}
 
 neutron_network_ml2_packages:
   pkg.installed:
@@ -96,6 +103,7 @@ neutron_network_services:
   - names: {{ bridge.services }}
   - enable: true
   - watch:
+    - file: /etc/neutron/neutron.conf
     - file: /etc/neutron/l3_agent.ini
     - file: /etc/neutron/dhcp_agent.ini
     - file: /etc/neutron/metadata_agent.ini
