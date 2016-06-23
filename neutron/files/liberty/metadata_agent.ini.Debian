@@ -1,21 +1,27 @@
+{%- if pillar.neutron.bridge is defined -%}
 {%- from "neutron/map.jinja" import bridge with context %}
+{% set neutron_settings = bridge %}
+{%- elif pillar.neutron.compute is defined -%}
+{%- from "neutron/map.jinja" import compute with context %}
+{% set neutron_settings = compute %}
+{%- endif -%}
 [DEFAULT]
 
-verbose = {{ bridge.metadata.verbose }}
+verbose = {{ neutron_settings.metadata.verbose }}
 
 # Show debugging output in log (sets DEBUG log level output)
 # debug = True
  
 # The Neutron user information for accessing the Neutron API.
-auth_url = http://{{ bridge.identity.host }}:5000/v2.0
-auth_region = {{ bridge.identity.get('region', 'RegionOne') }}
+auth_url = http://{{ neutron_settings.identity.host }}:5000/v2.0
+auth_region = {{ neutron_settings.identity.get('region', 'RegionOne') }}
 # Turn off verification of the certificate for ssl
 # auth_insecure = False
 # Certificate Authority public key (CA cert) file for ssl
 # auth_ca_cert =
-admin_tenant_name = {{ bridge.identity.tenant }}
-admin_user = {{ bridge.identity.user }}
-admin_password = {{ bridge.identity.password }}
+admin_tenant_name = {{ neutron_settings.identity.tenant }}
+admin_user = {{ neutron_settings.identity.user }}
+admin_password = {{ neutron_settings.identity.password }}
  
 # Network service endpoint type to pull from the keystone catalog
 # endpoint_type = adminURL
@@ -23,12 +29,12 @@ admin_password = {{ bridge.identity.password }}
 # IP address used by Nova metadata server
 # nova_metadata_ip = 127.0.0.1
 
-nova_metadata_ip = {{ bridge.metadata.host }}
+nova_metadata_ip = {{ neutron_settings.metadata.host }}
 
 # TCP Port used by Nova metadata server
 # nova_metadata_port = 8775
 
-nova_metadata_port = {{ bridge.metadata.port }}
+nova_metadata_port = {{ neutron_settings.metadata.port }}
 
 # Which protocol to use for requests to Nova metadata server, http or https
 # nova_metadata_protocol = http
@@ -50,7 +56,7 @@ nova_metadata_port = {{ bridge.metadata.port }}
 # Server. NOTE: Nova uses the same config key, but in [neutron] section.
 # metadata_proxy_shared_secret =
 
-metadata_proxy_shared_secret = {{ bridge.metadata.password }}
+metadata_proxy_shared_secret = {{ neutron_settings.metadata.password }}
  
 # Location of Metadata Proxy UNIX domain socket
 # metadata_proxy_socket = $state_path/metadata_proxy

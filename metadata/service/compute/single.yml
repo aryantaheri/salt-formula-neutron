@@ -17,7 +17,7 @@ parameters:
           bridge_mappings:
             - physical_network: vlan
               bridge: br-vlan
-              physical_interface: eth0
+#              physical_interface: eth0
         agent:
           tunnel_types:
             - gre

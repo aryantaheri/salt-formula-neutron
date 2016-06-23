@@ -9,6 +9,7 @@ parameters:
       plugin: ml2
       fwaas: false
       dns_domain: novalocal
+      router_distributed: True
       ml2:
         # type_drivers: e.g. flat,vlan,gre,vxlan,geneve
         type_drivers:
@@ -19,9 +20,9 @@ parameters:
           - geneve
         # tenant_network_types: e.g. vlan,gre,vxlan,geneve
         tenant_network_types:
-          - vlan
-          - gre
           - vxlan
+          - gre
+          - vlan
           - geneve
         mechanism_drivers:
           - openvswitch

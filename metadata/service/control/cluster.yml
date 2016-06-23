@@ -8,6 +8,7 @@ parameters:
       enabled: true
       fwaas: false
       dns_domain: novalocal
+      router_distributed: True
       ml2:
         # type_drivers: e.g. flat,vlan,gre,vxlan,geneve
         type_drivers:

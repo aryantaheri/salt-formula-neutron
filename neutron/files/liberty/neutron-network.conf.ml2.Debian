@@ -1,5 +1,5 @@
-{%- from "neutron/map.jinja" import server with context %}
-{% set neutron = server %}
+{%- from "neutron/map.jinja" import bridge with context %}
+{% set neutron = bridge %}
 [DEFAULT]
 # Print more verbose output (set logging level to INFO instead of default WARNING level).
 # verbose = False
@@ -12,9 +12,6 @@ verbose = true
 # value is "False" to support legacy mode (centralized) routers.
 #
 # router_distributed = False
-{%- if neutron.router_distributed is defined %}
-router_distributed = {{ neutron.router_distributed }}
-{% endif %}
 #
 # ===========End Global Config Option for Distributed L3 Router===============
 
@@ -46,11 +43,10 @@ state_path = /var/lib/neutron
 # publish_errors = False
 
 # Address to bind the API server to
-bind_host = {{ neutron.bind.address }}
+# bind_host = 
 
 # Port the bind the API server to
 # bind_port = 9696
-bind_port = {{ neutron.bind.port }}
 
 # Path to the extensions.  Note that this can be a colon-separated list of
 # paths.  For example:
@@ -133,7 +129,7 @@ auth_strategy = keystone
 # Allow sending resource operation notification to DHCP agent
 # dhcp_agent_notification = True
 
-dns_domain = {{ neutron.dns_domain }}
+
 
 # Enable or disable bulk create/update/delete operations
 # allow_bulk = True
@@ -367,15 +363,12 @@ notify_nova_on_port_data_changes = True
 
 # URL for connection to nova (Only supports one nova region currently).
 # nova_url = http://127.0.0.1:8774/v2
-nova_url = http://{{ neutron.compute.host }}:8774/v2
 
 # Name of nova region to use. Useful if keystone manages more than one region
 # nova_region_name =
-nova_region_name = {{ neutron.compute.region }}
 
 # Username for connection to nova in admin context
 # nova_admin_username =
-nova_admin_username = {{ neutron.compute.user }}
 
 # The uuid of the admin nova tenant
 # nova_admin_tenant_id =
@@ -384,15 +377,12 @@ nova_admin_username = {{ neutron.compute.user }}
 # is set, this is optional.  Useful for cases where the uuid of the admin
 # nova tenant is not available when configuration is being done.
 # nova_admin_tenant_name =
-nova_admin_tenant_name = {{ neutron.compute.tenant }}
 
 # Password for connection to nova in admin context.
 # nova_admin_password =
-nova_admin_password = {{ neutron.compute.password }}
 
 # Authorization URL for connection to nova in admin context.
 # nova_admin_auth_url =
-nova_admin_auth_url = http://{{ neutron.identity.host }}:35357/v2.0
 
 # CA file for novaclient to verify server certificates
 # nova_ca_certificates_file =
@@ -566,9 +556,9 @@ rpc_thread_pool_size=70
 # Driver or drivers to handle sending notifications. (multi
 # valued)
 # notification_driver=
-{%- if neutron.notification %}
-notification_driver = neutron.openstack.common.notifier.rpc_notifier
-{%- endif %}
+
+
+
 # AMQP topic used for OpenStack notifications. (list value)
 # Deprecated group/name - [rpc_notifier2]/topics
 # notification_topics=notifications
@@ -749,7 +739,6 @@ auth_region={{ neutron.identity.region }}
 [database]
 # This line MUST be changed to actually run the plugin.
 # Example:
-connection = {{ neutron.database.engine }}://{{ neutron.database.user }}:{{ neutron.database.password }}@{{ neutron.database.host }}/{{ neutron.database.name }}
 
 # Replace 127.0.0.1 above with the IP address of the database used by the
 # main neutron server. (Leave it as is if the database runs on this host.)
@@ -819,15 +808,6 @@ connection = {{ neutron.database.engine }}://{{ neutron.database.user }}:{{ neut
 
 # Timeout value for http requests
 # timeout =
-
-auth_url = http://{{ neutron.identity.host }}:{{ neutron.identity.port }}/v2.0
-auth_plugin = password
-#project_domain_id = default
-#user_domain_id = default
-region_name = {{ neutron.compute.region }}
-project_name = {{ neutron.compute.tenant }}
-username = {{ neutron.compute.user }}
-password = {{ neutron.compute.password }}
 
 #vif_types = vrouter
 

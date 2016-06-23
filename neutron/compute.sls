@@ -9,14 +9,6 @@ neutron_compute_packages:
   pkg.installed:
   - names: {{ compute.pkgs }}
 
-{%- if compute.dvr.enabled %}
-
-neutron_compute_packages_dvr:
-  pkg.installed:
-  - names: {{ compute.pkgs_dvr }}
-
-{%- endif %}
-
 {%- if compute.plugin == 'ml2' %}
 
 neutron_compute_packages_ml2:
@@ -37,6 +29,8 @@ neutron_compute_packages_ml2:
   - require:
     - pkg: neutron_compute_packages
     - pkg: neutron_compute_packages_ml2
+
+
 
 {% if compute.ml2.ovs.bridge_mappings is defined %}
 {% for bridge_mapping in compute.ml2.ovs.bridge_mappings -%}
@@ -66,9 +60,39 @@ neutron_compute_services:
   - enable: true
   - watch:
     - file: /etc/neutron/neutron.conf
-# Will be needed for DVR
-#    - file: /etc/neutron/plugins/ml2/ml2_conf.ini
     - file: /etc/neutron/plugins/ml2/openvswitch_agent.ini
+
+
+{%- if compute.dvr.enabled %}
+
+neutron_compute_packages_dvr:
+  pkg.installed:
+  - names: {{ compute.pkgs_dvr }}
+
+/etc/neutron/l3_agent.ini:
+  file.managed:
+  - source: salt://neutron/files/{{ compute.version }}/l3_agent.ini.{{ grains.os_family }}
+  - template: jinja
+  - require:
+    - pkg: neutron_compute_packages_dvr
+
+/etc/neutron/metadata_agent.ini:
+  file.managed:
+  - source: salt://neutron/files/{{ compute.version }}/metadata_agent.ini.{{ grains.os_family }}
+  - template: jinja
+  - require:
+    - pkg: neutron_compute_packages_dvr
+
+neutron_compute_services_dvr:
+  service.running:
+  - names: {{ compute.services_dvr }}
+  - enable: true
+  - watch:
+    - file: /etc/neutron/l3_agent.ini
+    - file: /etc/neutron/metadata_agent.ini
+
+{%- endif %}
+
 
 {%- endif %}
 

@@ -22,13 +22,19 @@ parameters:
             - gre
             - vxlan
           l2_population: True
+          # DVR and L2 population
+          arp_responder: True
           prevent_arp_spoofing: True
+          # DVR
+          enable_distributed_routing: True
         securitygroup:
           enabled: True
       l3_agent:
         verbose: True
         interface_driver: neutron.agent.linux.interface.OVSInterfaceDriver
         use_namespaces: True
+        # DVR, available options for the network node: legacy, dvr_snat
+        agent_mode: dvr_snat
       dhcp_agent:
         verbose: True
         interface_driver: neutron.agent.linux.interface.OVSInterfaceDriver

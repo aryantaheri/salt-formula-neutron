@@ -1,6 +1,13 @@
+{%- if pillar.neutron.bridge is defined -%}
 {%- from "neutron/map.jinja" import bridge with context %}
+{% set neutron_settings = bridge %}
+{%- elif pillar.neutron.compute is defined -%}
+{%- from "neutron/map.jinja" import compute with context %}
+{% set neutron_settings = compute %}
+{%- endif -%}
+
 [DEFAULT]
-verbose = {{ bridge.l3_agent.verbose }}
+verbose = {{ neutron_settings.l3_agent.verbose }}
 
 # Show debugging output in log (sets DEBUG log level output)
 # debug = False
@@ -13,7 +20,7 @@ verbose = {{ bridge.l3_agent.verbose }}
 # that supports L3 agent
 # interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
 
-interface_driver = {{ bridge.l3_agent.interface_driver }}
+interface_driver = {{ neutron_settings.l3_agent.interface_driver }}
 
 # MTU setting for device.
 # network_device_mtu =
@@ -32,7 +39,7 @@ interface_driver = {{ bridge.l3_agent.interface_driver }}
 # use_namespaces = True will be enforced.
 # use_namespaces = True
 
-use_namespaces = {{ bridge.l3_agent.use_namespaces }}
+use_namespaces = {{ neutron_settings.l3_agent.use_namespaces }}
 
 # If use_namespaces is set as False then the agent can only configure one router.
 
@@ -128,6 +135,10 @@ external_network_bridge =
 #   DVR. This mode must be used for an L3 agent running on a centralized
 #   node (or in single-host deployments, e.g. devstack).
 # agent_mode = legacy
+
+{%- if neutron_settings.l3_agent.agent_mode is defined %}
+agent_mode = {{ neutron_settings.l3_agent.agent_mode }}
+{%- endif %}
 
 # Location to store keepalived and all HA configurations
 # ha_confs_path = $state_path/ha_confs

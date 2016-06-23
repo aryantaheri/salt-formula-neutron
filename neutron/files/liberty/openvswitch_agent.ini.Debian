@@ -31,7 +31,6 @@
 # this hypervisor.
 #
 # local_ip =
-# TODO: make sure this works
 {% set tunnel_interface_ip = salt.network.ip_addrs(interface=neutron_settings.ml2.ovs.tunnel_interface)[0] %}
 local_ip = {{ tunnel_interface_ip }}
 
@@ -162,6 +161,8 @@ l2_population = {{ neutron_settings.ml2.agent.l2_population }}
 #
 # arp_responder = False
 
+arp_responder = {{ neutron_settings.ml2.agent.arp_responder }}
+
 # Enable suppression of ARP responses that don't match an IP address that
 # belongs to the port from which they originate.
 # Note: This prevents the VMs attached to this agent from spoofing,
@@ -182,6 +183,8 @@ prevent_arp_spoofing = {{ neutron_settings.ml2.agent.prevent_arp_spoofing }}
 # for distributed virtual routing.
 #
 # enable_distributed_routing = False
+
+enable_distributed_routing = {{ neutron_settings.ml2.agent.enable_distributed_routing }}
 
 # (IntOpt) Set new timeout in seconds for new rpc calls after agent receives
 # SIGTERM. If value is set to 0, rpc timeout won't be changed"
