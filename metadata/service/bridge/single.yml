@@ -16,7 +16,7 @@ parameters:
 #              physical_interface: eth0
             - physical_network: external
               bridge: br-ex
-              physical_interface: eth1
+              physical_interface: eth0.1
         agent:
           tunnel_types:
             - gre
