@@ -93,7 +93,11 @@ dnsmasq_config_file = {{ bridge.dhcp_agent.dnsmasq_config_file.path }}
 # Comma-separated list of DNS servers which will be used by dnsmasq
 # as forwarders.
 # dnsmasq_dns_servers =
- 
+
+{%- if bridge.dhcp_agent.dnsmasq_dns_servers is defined %}
+dnsmasq_dns_servers = {{ bridge.dhcp_agent.dnsmasq_dns_servers }}
+{%- endif %}
+
 # Base log dir for dnsmasq logging. The log contains DHCP and DNS log
 # information and is useful for debugging issues with either DHCP or DNS.
 # If this section is null, disable dnsmasq log.

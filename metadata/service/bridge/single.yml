@@ -45,6 +45,7 @@ parameters:
           options: 
             - 'dhcp-option-force = 26,1450'
             - 'log-facility = /var/log/neutron/dnsmasq.log'
+        dnsmasq_dns_servers: '8.8.8.8,4.2.2.1'
       migration: true
       mtu: 1500
       bind:
