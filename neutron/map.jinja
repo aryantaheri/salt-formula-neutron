@@ -32,6 +32,7 @@
 {% set server = salt['grains.filter_by']({
     'Debian': {
         'pkgs': ['neutron-server','neutron-lbaas-agent', 'gettext-base'],
+        'pkgs_lbaas': ['neutron-lbaas-agent'],
         'pkgs_ml2': ['neutron-plugin-ml2'],
         'services': ['neutron-server'],
         'notification': False
