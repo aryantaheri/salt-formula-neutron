@@ -12,15 +12,49 @@ parameters:
       ml2:
         # type_drivers: e.g. flat,vlan,gre,vxlan,geneve
         type_drivers:
+          - flat
+          - vlan
+          - gre
           - vxlan
+          - geneve
         # tenant_network_types: e.g. vlan,gre,vxlan,geneve
         tenant_network_types:
           - vxlan
+          - gre
+          - vlan
+          - geneve
         mechanism_drivers:
           - openvswitch
           - logger
+          - l2population
         extension_drivers:
           - port_security
+          # Mitaka+
+          #- dns          
+        path_mtu: 0
+        segment_mtu: 0
+        type_vlan:
+          network_vlan_ranges:
+            - physnet1:250:252
+        type_gre:
+          tunnel_id_ranges:
+            - '10:20'
+            - '20:30'
+        type_gre2:
+          tunnel_id_ranges:
+            - 10:20
+            - 20:30
+        type_vxlan:
+          vni_ranges:
+            - 100:200
+            - 200:300
+        type_geneve:
+          vni_ranges:
+            - 100:200
+            - 200:300
+        securitygroup:
+          enabled: True
+          ipset: True
       tunnel_type: vxlan
       version: ${_param:neutron_version}
       bind:

@@ -30,6 +30,8 @@ parameters:
           - l2population
         extension_drivers:
           - port_security
+          # Mitaka+
+          #- dns
         path_mtu: 0
         segment_mtu: 0
         type_vlan:

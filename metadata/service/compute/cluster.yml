@@ -14,17 +14,17 @@ parameters:
       ml2:
         ovs:
           tunnel_interface: eth0
-          bridge_mappings:
-            - physical_network: vlan
-              bridge: br-vlan
+#          bridge_mappings:
+#            - physical_network: vlan
+#              bridge: br-vlan
 #              physical_interface: eth0
-            - physical_network: external
-              bridge: br-ex
-              physical_interface: eth0.1
-        agent:
-          tunnel_types:
-            - gre
-            - vxlan
+#            - physical_network: external
+#              bridge: br-ex
+#              physical_interface: eth0.1
+#        agent:
+#          tunnel_types:
+#            - gre
+#            - vxlan
           l2_population: True
           # DVR and L2 Population
           arp_responder: True

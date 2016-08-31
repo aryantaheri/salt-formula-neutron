@@ -10,17 +10,17 @@ parameters:
       ml2:
         ovs:
           tunnel_interface: eth0
-          bridge_mappings: 
-            - physical_network: vlan
-              bridge: br-vlan
+#          bridge_mappings: 
+#            - physical_network: vlan
+#              bridge: br-vlan
 #              physical_interface: eth0
-            - physical_network: external
-              bridge: br-ex
-              physical_interface: eth0.1
+#            - physical_network: external
+#              bridge: br-ex
+#              physical_interface: eth0.1
         agent:
-          tunnel_types:
-            - gre
-            - vxlan
+#          tunnel_types:
+#            - gre
+#            - vxlan
           l2_population: True
           # DVR and L2 population
           arp_responder: True
@@ -40,11 +40,11 @@ parameters:
         interface_driver: neutron.agent.linux.interface.OVSInterfaceDriver
         dhcp_driver: neutron.agent.linux.dhcp.Dnsmasq
         enable_isolated_metadata: True
-        dnsmasq_config_file:
-          path: '/etc/neutron/dnsmasq-neutron.conf'
-          options: 
-            - 'dhcp-option-force = 26,1450'
-            - 'log-facility = /var/log/neutron/dnsmasq.log'
+#        dnsmasq_config_file:
+#          path: '/etc/neutron/dnsmasq-neutron.conf'
+#          options: 
+#            - 'dhcp-option-force = 26,1450'
+#            - 'log-facility = /var/log/neutron/dnsmasq.log'
         dnsmasq_dns_servers: '8.8.8.8,4.2.2.1'
       migration: true
       mtu: 1500
