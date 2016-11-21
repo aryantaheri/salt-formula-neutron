@@ -36,6 +36,7 @@ parameters:
         type_vlan:
           network_vlan_ranges:
             - physnet1:250:252
+            - external:210:212
         type_gre:
           tunnel_id_ranges:
             - '10:20'
