@@ -11,7 +11,7 @@
         'pkgs': ['openstack-neutron-openvswitch', 'openvswitch', 'fuel-utils'],
         'services': ['openvswitch', 'neutron-openvswitch-agent']
     },
-}, merge=salt['pillar.get']('neutron:compute')) %}
+}, merge=pillar.neutron.get('compute', {})) %}
 
 {% set bridge = salt['grains.filter_by']({
     'Debian': {
@@ -27,7 +27,7 @@
         'migration_pkgs': ['fuel-utils',],
         'services': ['neutron-openvswitch-agent', 'neutron-metadata-agent', 'neutron-l3-agent', 'neutron-dhcp-agent']
     },
-}, merge=salt['pillar.get']('neutron:bridge')) %}
+}, merge=pillar.neutron.get('brigde', {})) %}
 
 {% set server = salt['grains.filter_by']({
     'Debian': {
@@ -43,4 +43,23 @@
         'services': ['neutron-server'],
         'notification': False
     },
-}, merge=salt['pillar.get']('neutron:server')) %}
+}, merge=pillar.neutron.get('server', {})) %}
+
+{%- if pillar.neutron.server.enabled %}
+
+{%- set tmp_server = pillar.neutron.server %}
+
+{%- if not tmp_server.backend is defined %}
+
+{%- if tmp_server.plugin == "contrail" %}
+
+{%- from "opencontrail/map.jinja" import config with context %}
+
+{%- set backend = {'engine': tmp_server.plugin, 'host': config.discovery.host, 'token': config.identity.token, 'user': config.identity.user, 'password': config.identity.password, 'tenant': config.identity.tenant} %}
+{%- set tmp = server.update({'backend': backend}) %}
+
+{%- endif %}
+
+{%- endif %}
+
+{%- endif %}

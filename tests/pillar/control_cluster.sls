@@ -1,11 +1,17 @@
 neutron:
   server:
     enabled: true
-    plugin: opencontrail
     fwaas: false
     dns_domain: novalocal
     tunnel_type: vxlan
     version: liberty
+    backend:
+      engine: contrail
+      host: 127.0.0.1
+      user: admin
+      password: password
+      token: token
+      tenant: admin
     bind:
       address: 127.0.0.1
       port: 9696
