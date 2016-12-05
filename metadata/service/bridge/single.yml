@@ -3,10 +3,13 @@ applications:
 parameters:
   neutron:
     bridge:
-      enabled: true
-      version: liberty
+      enabled: True
+      version: ${_param:neutron_version}
       verbose: True
       plugin: ml2
+      router_distributed: True
+      service_plugins:
+        - router
       ml2:
         ovs:
           tunnel_interface: eth0
@@ -28,10 +31,14 @@ parameters:
           # DVR
           enable_distributed_routing: True
         securitygroup:
-          enabled: True
+          #enable: True #Deprecated
+          firewall_driver: iptables_hybrid
+          enable_security_group: True
+          enable_ipset: True
       l3_agent:
         verbose: True
         interface_driver: neutron.agent.linux.interface.OVSInterfaceDriver
+        # Liberty-
         use_namespaces: True
         # DVR, available options for the network node: legacy, dvr_snat
         agent_mode: dvr_snat
@@ -45,7 +52,9 @@ parameters:
 #          options: 
 #            - 'dhcp-option-force = 26,1450'
 #            - 'log-facility = /var/log/neutron/dnsmasq.log'
-        dnsmasq_dns_servers: '8.8.8.8,4.2.2.1'
+        dnsmasq_dns_servers:
+          - 8.8.8.8
+          - 4.2.2.1
       migration: true
       mtu: 1500
       bind:

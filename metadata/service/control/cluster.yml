@@ -9,6 +9,11 @@ parameters:
       fwaas: false
       dns_domain: novalocal
       router_distributed: True
+      notification: true
+      service_plugins:
+        - router
+      backend:
+        engine: "ml2"
       ml2:
         # type_drivers: e.g. flat,vlan,gre,vxlan,geneve
         type_drivers:
@@ -30,12 +35,16 @@ parameters:
         extension_drivers:
           - port_security
           # Mitaka+
-          #- dns          
-        path_mtu: 0
+          - dns          
+        path_mtu: 1500
         segment_mtu: 0
+        # Mitaka+
+        #physical_network_mtus: 
+        #  - physnet0:1500
         type_vlan:
           network_vlan_ranges:
             - physnet1:250:252
+            - physnet2
             - external:210:212
         type_gre:
           tunnel_id_ranges:
@@ -54,6 +63,7 @@ parameters:
             - 100:200
             - 200:300
         securitygroup:
+          firewall_driver: iptables_hybrid
           enabled: True
           ipset: True
       tunnel_type: vxlan
@@ -62,7 +72,7 @@ parameters:
         address: ${_param:cluster_local_address}
         port: 9696
       database:
-        engine: mysql
+        engine: mysql+pymysql
         host: ${_param:cluster_vip_address}
         port: 3306
         name: neutron

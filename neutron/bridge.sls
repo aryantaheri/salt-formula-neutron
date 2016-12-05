@@ -31,7 +31,7 @@ neutron_network_precise_packages:
 
 /etc/neutron/neutron.conf:
   file.managed:
-  - source: salt://neutron/files/{{ bridge.version }}/neutron-network.conf.{{ bridge.plugin }}.{{ grains.os_family }}
+  - source: salt://neutron/files/{{ bridge.version }}/neutron-generic.conf.{{ bridge.plugin }}.{{ grains.os_family }}
   - template: jinja
   - require:
     - pkg: neutron_network_packages
@@ -65,28 +65,28 @@ add_physical_interface_{{ bridge_mapping.physical_interface }}_to_{{ bridge_mapp
 
 /etc/neutron/plugins/ml2/openvswitch_agent.ini:
   file.managed:
-  - source: salt://neutron/files/{{ bridge.version }}/openvswitch_agent.ini.{{ grains.os_family }}
+  - source: salt://neutron/files/{{ bridge.version }}/openvswitch_agent.ini
   - template: jinja
   - require:
     - pkg: neutron_network_packages
 
 /etc/neutron/l3_agent.ini:
   file.managed:
-  - source: salt://neutron/files/{{ bridge.version }}/l3_agent.ini.{{ grains.os_family }}
+  - source: salt://neutron/files/{{ bridge.version }}/l3_agent.ini
   - template: jinja
   - require:
     - pkg: neutron_network_packages
 
 /etc/neutron/dhcp_agent.ini:
   file.managed:
-  - source: salt://neutron/files/{{ bridge.version }}/dhcp_agent.ini.{{ grains.os_family }}
+  - source: salt://neutron/files/{{ bridge.version }}/dhcp_agent.ini
   - template: jinja
   - require:
     - pkg: neutron_network_packages
 
 /etc/neutron/metadata_agent.ini:
   file.managed:
-  - source: salt://neutron/files/{{ bridge.version }}/metadata_agent.ini.{{ grains.os_family }}
+  - source: salt://neutron/files/{{ bridge.version }}/metadata_agent.ini
   - template: jinja
   - require:
     - pkg: neutron_network_packages

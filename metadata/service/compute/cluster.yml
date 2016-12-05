@@ -6,9 +6,12 @@ parameters:
       enabled: true
       debug: True
       verbose: True
-      version: liberty
+      version: ${_param:neutron_version}
       notification: True
       plugin: "ml2"
+      router_distributed: True
+      service_plugins:
+        - router
       dvr:
         enabled: True
       ml2:
@@ -32,7 +35,10 @@ parameters:
           # DVR
           enable_distributed_routing: True
         securitygroup:
-          enabled: True
+          # enabled: True # Deprecated
+          firewall_driver: iptables_hybrid
+          enable_security_group: True
+          enable_ipset: True
       # DVR
       l3_agent:
         verbose: True
