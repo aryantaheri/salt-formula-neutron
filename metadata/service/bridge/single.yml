@@ -63,7 +63,7 @@ parameters:
         verbose: True
         host: ${_param:cluster_vip_address}
         port: 8775
-        password: metadataPass
+        password: ${_param:nova_neutron_metadata_shared_secret}
       identity:
         engine: keystone
         region: RegionOne
