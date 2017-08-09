@@ -40,6 +40,15 @@ create_ovs_bridge_{{ bridge_mapping.bridge }}:
     - name: "ovs-vsctl add-br {{ bridge_mapping.bridge }}"
     - unless: "ovs-vsctl br-exists {{ bridge_mapping.bridge }}"
 
+{% if bridge_mapping.get('rstp_enable', false) %}
+set_ovs_bridge_{{ bridge_mapping.bridge }}_options:
+  cmd.run:
+    - name: "ovs-vsctl set Bridge {{ bridge_mapping.bridge }} rstp_enable=true"
+    - onlyif: "ovs-vsctl br-exists {{ bridge_mapping.bridge }}"
+    - require:
+        - cmd: create_ovs_bridge_{{ bridge_mapping.bridge }}
+{% endif %}
+      
 {% if bridge_mapping.physical_interface is defined %}
 add_physical_interface_{{ bridge_mapping.physical_interface }}_to_{{ bridge_mapping.bridge }}:
     cmd.run:
@@ -50,6 +59,30 @@ add_physical_interface_{{ bridge_mapping.physical_interface }}_to_{{ bridge_mapp
       - cmd: create_ovs_bridge_{{ bridge_mapping.bridge }}
 {% endif %}
 
+{% if bridge_mapping.tunnel_interfaces is defined %}
+{% for tunnel_interface in bridge_mapping.tunnel_interfaces -%}
+add_tunnel_interface_{{ tunnel_interface.name }}_to_{{ bridge_mapping.bridge }}:
+  cmd.run:
+    - name: "ovs-vsctl add-port {{ bridge_mapping.bridge }} {{ tunnel_interface.name }} \
+      -- set interface {{ tunnel_interface.name }} \
+      type={{ tunnel_interface.type }} \
+      options:{{ tunnel_interface.get('options') | join(' options:') }}"
+    - unless: "ovs-vsctl list-ports {{ bridge_mapping.bridge }} | grep {{ tunnel_interface.name }}"
+    - require:
+      - cmd: create_ovs_bridge_{{ bridge_mapping.bridge }}    
+
+set_tunnel_interface_{{ tunnel_interface.name }}_options:
+  cmd.run:
+    - name: "ovs-vsctl set Interface {{ tunnel_interface.name }} \
+      type={{ tunnel_interface.type }} \
+      options:{{ tunnel_interface.get('options') | join(' options:') }}"
+    - onlyif: "ovs-vsctl list-ports {{ bridge_mapping.bridge }} | grep {{ tunnel_interface.name }}"
+#    - require:
+#      - cmd: create_ovs_bridge_{{ bridge_mapping.bridge }}
+
+{% endfor %}
+{% endif %}
+          
 {% endfor %}
 {% endif %}
 
